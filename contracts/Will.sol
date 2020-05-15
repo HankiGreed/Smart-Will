@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.6.0;
 
 
@@ -40,7 +41,7 @@ contract Will {
     }
 
     function addBenefeciary(address beneficiary, uint shareInAmount) public {
-        require(willAlreadyExists(msg.sender),"Your will doesn't exists, Maybe create one ?")
+        require(willAlreadyExists(msg.sender),"Your will doesn't exists, Maybe create one ?");
         allWills[msg.sender].beneficiaries.push(payable(beneficiary));
         allWills[msg.sender].shares.push(shareInAmount);
     }
