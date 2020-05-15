@@ -46,22 +46,28 @@ contract Will {
         allWills[msg.sender].shares.push(shareInAmount);
     }
 
-
+    function getWillState() public view returns (State) {
+        return allWills[msg.sender].state;
+    }
     function getAllBeneficiaries() public view returns (address payable [] memory) {
-        require (allWills[msg.sender].state != State.Active ,"Your Will either has no beneficiaries, or is Paid out !");
+        require (allWills[msg.sender].state == State.Active ,"Your Will either has no beneficiaries, or is Paid out !");
         return allWills[msg.sender].beneficiaries;
     }
 
     function getSharesOfBeneficiaries () public view returns(uint [] memory) {
-        require (allWills[msg.sender].state != State.Active ,"Your Will either has no beneficiaries, or is Paid out !");
+        require (allWills[msg.sender].state == State.Active ,"Your Will either has no beneficiaries, or is Paid out !");
         return allWills[msg.sender].shares;
     }
 
     function getTotalAmount () public view returns(uint) {
-        require (allWills[msg.sender].state != State.Active ,"Your will doesn't exists, Maybe create one ?");
+        require (allWills[msg.sender].state != State.NonExistent ,"Your will doesn't exists, Maybe create one ?");
         return allWills[msg.sender].totalAmount;
     }
 
+    function getCurrentEndDate() public view returns(uint) {
+        require (allWills[msg.sender].state == State.Active ,"Your will doesn't exists, Maybe create one ?");
+        return allWills[msg.sender].payoutDate; 
+    }
 
     function editWill (address[] memory addresses,uint[] memory shares, uint payoutDate) public {
         require (willAlreadyExists(msg.sender),"Your will doesn't exists, Maybe create one ?");
@@ -71,5 +77,6 @@ contract Will {
             addBenefeciary(addresses[i],shares[i]);
         }
         allWills[msg.sender].payoutDate = payoutDate;
+        allWills[msg.sender].state = State.Active;
     } 
 }
