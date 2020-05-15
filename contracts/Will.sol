@@ -40,7 +40,7 @@ contract Will {
         allWills[msg.sender].state = State.Created;
     }
 
-    function addBenefeciary(address beneficiary, uint shareInAmount) public {
+    function addBenefeciary(address beneficiary, uint shareInAmount) internal {
         require(willAlreadyExists(msg.sender),"Your will doesn't exists, Maybe create one ?");
         allWills[msg.sender].beneficiaries.push(payable(beneficiary));
         allWills[msg.sender].shares.push(shareInAmount);
