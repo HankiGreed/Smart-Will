@@ -4,7 +4,7 @@ contract('Will', (accounts) => {
   let will;
   let ONE_ETH = 1e18;
 
-  //const NonExistent = 0;
+  const NonExistent = 0;
   const Created = 1;
   const Active = 2;
   const PaidOut = 3;
@@ -81,8 +81,30 @@ contract('Will', (accounts) => {
       {from: accounts[0]},
     );
     await will.setCurrentTime(910, {from: accounts[0]});
+    let beforeBalance = web3.utils.toBN(await web3.eth.getBalance(accounts[1]));
     await will.payoutExpiredWills({from: accounts[0]});
+    let afterBalance = web3.utils.toBN(await web3.eth.getBalance(accounts[1]));
+    afterBalance.isub(beforeBalance);
+    expect(afterBalance).to.deep.equal(etherAmount);
     let state = await will.getWillState({from: accounts[0]});
     expect(state.valueOf().toNumber()).to.equal(PaidOut);
+  });
+
+  it('Should let people delete will and get money back', async () => {
+    let etherAmount = web3.utils.toBN('1000000000000000000');
+    let threeEtherAmount = web3.utils.toBN('3000000000000000000');
+    await will.editWill(
+      [accounts[1], accounts[3]],
+      [etherAmount, etherAmount],
+      899,
+      {from: accounts[0]},
+    );
+
+    let beforeBalance = web3.utils.toBN(await web3.eth.getBalance(accounts[0]));
+    await will.deleteWill({from: accounts[0]});
+    let afterBalance = web3.utils.toBN(await web3.eth.getBalance(accounts[0]));
+    expect(afterBalance.gt(beforeBalance)).to.equal(true);
+    let state = await will.getWillState({from: accounts[0]});
+    expect(state.valueOf().toNumber()).to.equal(NonExistent);
   });
 });

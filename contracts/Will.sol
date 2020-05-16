@@ -21,12 +21,6 @@ contract Will {
     address payable [] willOwners;
     mapping (address => willDetails) allWills;
 
-
-    //modifier inState (State expected,address addr) {
-        //require (allWills[addr].state == expected,"Invalid method call in this state !");
-        //_;
-    //}
-
     function willAlreadyExists (address addr) internal view returns(bool) {
         if (allWills[addr].state != State.NonExistent) {
             return true;
@@ -82,12 +76,21 @@ contract Will {
         allWills[msg.sender].state = State.Active;
     } 
 
+    function deleteWill() public {
+        require(willAlreadyExists(msg.sender), "Your Will doen't exist, Maybe create one ?");
+        msg.sender.transfer(allWills[msg.sender].totalAmount);
+        delete allWills[msg.sender];
+    }
+
     function payoutExpiredWills() public {
         for (uint i=0; i < willOwners.length; i++){
             if (allWills[willOwners[i]].state == State.Active) {
                 if (checkTimeOfWill(allWills[willOwners[i]].payoutDate) ){
                     payOutWill(willOwners[i]);
                 }
+            }
+            if (allWills[willOwners[i]].state == State.NonExistent) {
+                delete willOwners[i];
             }
         }
     }
