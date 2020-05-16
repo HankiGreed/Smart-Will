@@ -8,7 +8,7 @@ pragma solidity ^0.6.0;
 
 contract Will {
 
-    enum State {NonExistent,Created, Active, OverDeadline, PaidOut}
+    enum State {NonExistent,Created, Active,PaidOut}
     struct willDetails {
 
         address payable [] beneficiaries;
@@ -18,13 +18,14 @@ contract Will {
         State state;
     }
 
+    address payable [] willOwners;
     mapping (address => willDetails) allWills;
 
 
-    modifier inState (State expected,address addr) {
-        require (allWills[addr].state == expected,"Invalid method call in this state !");
-        _;
-    }
+    //modifier inState (State expected,address addr) {
+        //require (allWills[addr].state == expected,"Invalid method call in this state !");
+        //_;
+    //}
 
     function willAlreadyExists (address addr) internal view returns(bool) {
         if (allWills[addr].state != State.NonExistent) {
@@ -36,6 +37,7 @@ contract Will {
 
     function initWill () public payable {
         require (!willAlreadyExists(msg.sender),"Your will already exists, Maybe modify it ?");
+        willOwners.push(payable(msg.sender));
         allWills[msg.sender].totalAmount = msg.value;
         allWills[msg.sender].state = State.Created;
     }
@@ -76,7 +78,35 @@ contract Will {
         for (uint i = 0; i < addresses.length;i++) {
             addBenefeciary(addresses[i],shares[i]);
         }
-        allWills[msg.sender].payoutDate = payoutDate;
+        allWills[msg.sender].payoutDate = now + payoutDate;
         allWills[msg.sender].state = State.Active;
     } 
+
+    function payoutExpiredWills() public {
+        for (uint i=0; i < willOwners.length; i++){
+            if (allWills[willOwners[i]].state == State.Active) {
+                if (checkTimeOfWill(allWills[willOwners[i]].payoutDate) ){
+                    payOutWill(willOwners[i]);
+                }
+            }
+        }
+    }
+
+    function payOutWill (address owner) internal {
+        for (uint i=0;i<allWills[owner].beneficiaries.length; i++){
+            if (!allWills[owner].beneficiaries[i].send(allWills[owner].shares[i])) {
+                payable(owner).transfer((allWills[owner].shares[i]));
+                allWills[owner].totalAmount - allWills[owner].shares[i];
+            }
+        }
+
+        allWills[owner].state = State.PaidOut;
+    }
+
+    function getCurrentTime ()virtual internal view returns(uint){
+        return now;
+    }
+    function checkTimeOfWill (uint time) public view returns(bool){
+        return getCurrentTime() > time;
+    }
 }
