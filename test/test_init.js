@@ -92,7 +92,6 @@ contract('Will', (accounts) => {
 
   it('Should let people delete will and get money back', async () => {
     let etherAmount = web3.utils.toBN('1000000000000000000');
-    let threeEtherAmount = web3.utils.toBN('3000000000000000000');
     await will.editWill(
       [accounts[1], accounts[3]],
       [etherAmount, etherAmount],
