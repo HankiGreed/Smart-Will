@@ -1,1 +1,22 @@
 /build 
+/react-will/node_modules
+
+/react-will/.pnp
+/react-will.pnp.js
+
+# testing
+/react-will/coverage
+
+# production
+/react-will/build
+
+# misc
+/react-will/.DS_Store
+/react-will/.env.local
+/react-will/.env.development.local
+/react-will/.env.test.local
+/react-will/.env.production.local
+
+/react-will/npm-debug.log*
+/react-will/yarn-debug.log*
+/react-will/yarn-error.log*
