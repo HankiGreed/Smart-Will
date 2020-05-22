@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@drizzle/react-components": "^1.5.1",
-    "@drizzle/react-plugin": "^1.5.1",
-    "@drizzle/store": "^1.5.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -14,7 +11,8 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.88.2"
+    "semantic-ui-react": "^0.88.2",
+    "web3": "^1.2.7"
   },
   "scripts": {
     "start": "react-scripts start",
