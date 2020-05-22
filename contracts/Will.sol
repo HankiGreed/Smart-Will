@@ -4,7 +4,7 @@ pragma solidity ^0.6.0;
 
 /* Since you canno return array of structs in sollidity (Still experimental)
     I decided to have an array of all beneficiaries and an array of all 
-    the share */
+    their shares */
 
 contract Will {
 
@@ -46,12 +46,12 @@ contract Will {
         return allWills[msg.sender].state;
     }
     function getAllBeneficiaries() public view returns (address payable [] memory) {
-        require (allWills[msg.sender].state == State.Active ,"Your Will either has no beneficiaries, or is Paid out !");
+        require (willAlreadyExists(msg.sender) ,"Your Will Doesn't Exist !"); 
         return allWills[msg.sender].beneficiaries;
     }
 
     function getSharesOfBeneficiaries () public view returns(uint [] memory) {
-        require (allWills[msg.sender].state == State.Active ,"Your Will either has no beneficiaries, or is Paid out !");
+        require (willAlreadyExists(msg.sender) ,"Your Will Doesn't Exist !");
         return allWills[msg.sender].shares;
     }
 
