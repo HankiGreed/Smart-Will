@@ -6,11 +6,7 @@ const MenuBar = ({showNewWill, homeHandler, clickHandler}) => {
   return (
     <React.Fragment>
       <Menu icon="labeled">
-        <Menu.Item name="Home" onClick={homeHandler}>
-          <Icon name="home" />
-          Home
-        </Menu.Item>
-        <Menu.Menu position="right">
+        <Menu.Menu>
           {!showNewWill ? (
             <Menu.Item name="New Will" onClick={clickHandler} as="a">
               <Icon name="plus" color="blue" />
@@ -23,6 +19,10 @@ const MenuBar = ({showNewWill, homeHandler, clickHandler}) => {
             </Menu.Item>
           )}
         </Menu.Menu>
+        <Menu.Item name="Home" onClick={homeHandler} position="right">
+          <Icon name="home" />
+          Home
+        </Menu.Item>
       </Menu>
     </React.Fragment>
   );

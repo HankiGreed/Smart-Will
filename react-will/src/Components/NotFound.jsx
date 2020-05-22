@@ -1,6 +1,19 @@
-import React from 'react';
+import React, {Component} from 'react';
+import {Message, Container} from 'semantic-ui-react';
 
-const NotFound = ({props}) => {
-  return <h1>Not Found !</h1>;
-};
+class NotFound extends Component {
+  render() {
+    return (
+      <Container textAlign="center">
+        <Message
+          negative
+          size="massive"
+          icon="warning sign"
+          header="Not Found !"
+          content="How did you even get to this page ?"
+        />
+      </Container>
+    );
+  }
+}
 export default NotFound;
