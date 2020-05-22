@@ -40,9 +40,11 @@ class EditWill extends Component {
     const stateOfWill = await Will.methods
       .getWillState()
       .call({from: this.state.account});
-    const willAmount = await Will.methods
-      .getTotalAmount()
-      .call({from: this.state.account});
+    const willAmount = web3.utils
+      .toBN(
+        await Will.methods.getTotalAmount().call({from: this.state.account}),
+      )
+      .toString(10);
     const beneficiaries = await Will.methods
       .getAllBeneficiaries()
       .call({from: this.state.account})
@@ -60,7 +62,7 @@ class EditWill extends Component {
       shares: shares,
       willState: stateOfWill,
       willEnd: willEnd,
-      willAmount: willAmount,
+      willAmount: willAmount.toString(),
     });
     console.log('Did Mount ', accounts, stateOfWill, willEnd);
   }
@@ -70,11 +72,20 @@ class EditWill extends Component {
     if (this.state.beneficiary === '') this.setState({beneficiaryError: true});
     if (this.state.share === '') this.setState({shareError: true});
     if (this.state.beneficiary !== '' && this.state.share !== '') {
-      this.setState({
-        beneficiaries: [...this.state.beneficiaries, this.state.beneficiary],
-        shares: [...this.state.shares, this.state.share],
-      });
-      this.setState({beneficiary: '', share: ''});
+      const shareInWei = web3.utils.toWei(this.state.share, 'ether');
+      if (
+        web3.utils.toBN(this.state.willAmount).gte(web3.utils.toBN(shareInWei))
+      ) {
+        this.setState({
+          beneficiaries: [...this.state.beneficiaries, this.state.beneficiary],
+          shares: [
+            ...this.state.shares,
+            web3.utils.toWei(this.state.share, 'ether'),
+          ],
+          willAmount: this.state.willAmount - shareInWei,
+        });
+        this.setState({beneficiary: '', share: ''});
+      }
     }
   };
 
@@ -83,7 +94,11 @@ class EditWill extends Component {
       (item, j) => i !== j,
     );
     const newShares = this.state.shares.filter((item, j) => i !== j);
-    this.setState({beneficiaries: newBeneficiaries, shares: newShares});
+    this.setState({
+      beneficiaries: newBeneficiaries,
+      shares: newShares,
+      willAmount: this.state.willAmount + parseInt(this.state.shares[i]),
+    });
   };
 
   onChange = (e) => {
@@ -172,6 +187,7 @@ class EditWill extends Component {
                   />
                 </Form.Group>
                 <Button
+                  disabled={this.state.willAmount === 0}
                   size="big"
                   fluid
                   type="submit"
