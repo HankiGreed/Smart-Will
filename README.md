@@ -19,6 +19,6 @@ A Smart contract to execute your will, With Frontend.
     - [ ] Payout Will 
     - [ ] Save Will 
 
-- [ ] Form Validation
+- [x] Form Validation
     - [x] Empty Beneficiary Issue
     - [x] Sum of Value Verification
