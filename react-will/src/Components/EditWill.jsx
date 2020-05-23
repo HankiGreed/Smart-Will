@@ -8,9 +8,6 @@ import {
   Divider,
   Statistic,
   Grid,
-  GridRow,
-  Input,
-  Modal,
 } from 'semantic-ui-react';
 import contractAddress from '../Ethereum/contractAddress.js';
 import createContract from '../Ethereum/WillContract.js';

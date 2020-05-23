@@ -1,5 +1,5 @@
 import React from 'react';
-import {Icon, Menu, Divider} from 'semantic-ui-react';
+import {Icon, Menu} from 'semantic-ui-react';
 import history from '../history';
 
 const buttonSelector = (state, address, clickHandler, condition) => {
