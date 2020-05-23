@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import {Container, Table, Button} from 'semantic-ui-react';
+import {Container, Table, Button, Divider} from 'semantic-ui-react';
 import createContract from '../Ethereum/WillContract.js';
 import web3 from '../Ethereum/web3.js';
 import contractAddress from '../Ethereum/contractAddress.js';
+import MenuBar from './Menu.jsx';
 
 class ViewWill extends Component {
   constructor() {
@@ -18,6 +19,7 @@ class ViewWill extends Component {
   }
   async componentDidMount() {
     const accounts = await web3.eth.getAccounts();
+    this.setState({account: accounts[0]});
     const Will = await createContract(contractAddress);
     const willAmount = await Will.methods
       .getTotalAmount()
@@ -50,6 +52,13 @@ class ViewWill extends Component {
   render() {
     return (
       <React.Fragment>
+        <Container>
+          <MenuBar
+            address={this.state.account}
+            willStatButton={this.state.willState}
+          />
+        </Container>
+        <Divider />
         <Container>
           <Table color="blue" celled>
             <Table.Header>

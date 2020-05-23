@@ -8,16 +8,21 @@ import {
   Divider,
   Statistic,
   Grid,
+  GridRow,
+  Input,
+  Modal,
 } from 'semantic-ui-react';
 import contractAddress from '../Ethereum/contractAddress.js';
 import createContract from '../Ethereum/WillContract.js';
 import web3 from '../Ethereum/web3';
+import MenuBar from './Menu.jsx';
 
 class EditWill extends Component {
   constructor(props) {
     window.ethereum.enable();
     super(props);
     this.state = {
+      color: 'teal',
       account: '',
       willState: 0,
       willAmount: 0,
@@ -28,6 +33,9 @@ class EditWill extends Component {
       share: '',
       beneficiaryError: false,
       shareError: false,
+      dateError: false,
+      saveDisabled: true,
+      modalOpen: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.deleteBeneficiary = this.deleteBeneficiary.bind(this);
@@ -62,9 +70,8 @@ class EditWill extends Component {
       shares: shares,
       willState: stateOfWill,
       willEnd: willEnd,
-      willAmount: willAmount.toString(),
+      willAmount: willAmount,
     });
-    console.log('Did Mount ', accounts, stateOfWill, willEnd);
   }
 
   handleSubmit = (e) => {
@@ -76,19 +83,41 @@ class EditWill extends Component {
       if (
         web3.utils.toBN(this.state.willAmount).gte(web3.utils.toBN(shareInWei))
       ) {
+        const remaining = web3.utils
+          .toBN(this.state.willAmount)
+          .isub(web3.utils.toBN(shareInWei))
+          .toString();
         this.setState({
           beneficiaries: [...this.state.beneficiaries, this.state.beneficiary],
           shares: [
             ...this.state.shares,
             web3.utils.toWei(this.state.share, 'ether'),
           ],
-          willAmount: this.state.willAmount - shareInWei,
+          willAmount: remaining,
         });
         this.setState({beneficiary: '', share: ''});
+        if (remaining === '0') {
+          this.setState({saveDisabled: false, color: 'red'});
+        }
       }
     }
   };
 
+  handleSave = async () => {
+    if (new Date(this.state.willEnd).getTime() < new Date().getTime()) {
+      this.setState({dateError: true});
+    } else if (this.state.saveDisabled === true) {
+      this.setState({modalOpen: true});
+    } else {
+      const Will = await createContract(contractAddress);
+      const dateinUnix = Math.floor(
+        new Date(this.state.willEnd).getTime() / 1000,
+      );
+      await Will.methods
+        .editWill(this.state.beneficiaries, this.state.shares, dateinUnix)
+        .send({from: this.state.account});
+    }
+  };
   deleteBeneficiary = (i) => {
     const newBeneficiaries = this.state.beneficiaries.filter(
       (item, j) => i !== j,
@@ -97,23 +126,40 @@ class EditWill extends Component {
     this.setState({
       beneficiaries: newBeneficiaries,
       shares: newShares,
-      willAmount: this.state.willAmount + parseInt(this.state.shares[i]),
+      willAmount: web3.utils
+        .toBN(this.state.willAmount)
+        .iadd(web3.utils.toBN(this.state.shares[i]))
+        .toString(),
+      saveDisabled: true,
+      color: 'teal',
     });
   };
 
   onChange = (e) => {
     e.preventDefault();
     this.setState({[e.target.name]: e.target.value});
-    this.setState({beneficiaryError: false, shareError: false});
+    this.setState({
+      beneficiaryError: false,
+      shareError: false,
+      dateError: false,
+    });
   };
 
   render() {
     return (
       <React.Fragment>
+        <Container>
+          <MenuBar
+            address={this.state.address}
+            willStatButton={'2'}
+            condition={this.state.saveDisabled}
+          />
+        </Container>
+        <Divider />
         <Grid columns={1}>
           <Grid.Row>
             <Container textAlign="center">
-              <Statistic>
+              <Statistic color={this.state.color} size="small">
                 <Statistic.Label>Remaining Will Amount In Wei</Statistic.Label>
                 <Statistic.Value>
                   <Icon name="ethereum" />
@@ -166,6 +212,7 @@ class EditWill extends Component {
               <Form fullWidth colspan="2">
                 <Form.Group widths="equal">
                   <Form.Input
+                    size="small"
                     error={this.state.beneficiaryError}
                     onChange={this.onChange}
                     name="beneficiary"
@@ -176,6 +223,7 @@ class EditWill extends Component {
                     placeholder="0x...."
                   />
                   <Form.Input
+                    size="small"
                     error={this.state.shareError}
                     onChange={this.onChange}
                     fluid
@@ -187,8 +235,8 @@ class EditWill extends Component {
                   />
                 </Form.Group>
                 <Button
-                  disabled={this.state.willAmount === 0}
-                  size="big"
+                  disabled={!this.state.saveDisabled}
+                  size="medium"
                   fluid
                   type="submit"
                   content="Add"
@@ -198,6 +246,34 @@ class EditWill extends Component {
                   onClick={this.handleSubmit}>
                   <Icon name="plus" />
                   Add Beneficiary !
+                </Button>
+              </Form>
+            </Container>
+          </Grid.Row>
+          <Grid.Row>
+            <Container>
+              <Form fullWidth colspan="2">
+                <Form.Group widths="equal">
+                  <Form.Input
+                    error={this.state.dateError}
+                    type="date"
+                    fluid
+                    label="Will Payout Date"
+                    name="willEnd"
+                    onChange={this.onChange}
+                    required
+                    min={new Date(0)}
+                  />
+                </Form.Group>
+                <Button
+                  fluid
+                  type="submit"
+                  icon
+                  labelPosition="right"
+                  color="youtube"
+                  onClick={this.handleSave}>
+                  <Icon name="save" />
+                  Save The Will !
                 </Button>
               </Form>
             </Container>

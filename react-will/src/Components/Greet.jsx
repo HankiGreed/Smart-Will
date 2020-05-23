@@ -1,16 +1,15 @@
 import React from 'react';
-import {Container, Message} from 'semantic-ui-react';
+import {Container, Message, Divider} from 'semantic-ui-react';
+import MenuBar from './Menu.jsx';
 
 const Greet = ({account}) => {
   return (
     <React.Fragment>
+      <Container>
+        <MenuBar address={account} />
+      </Container>
+      <Divider />
       <Container width={10}>
-        <Message
-          color="orange"
-          size="huge"
-          icon="chess"
-          header={`Hey ${account} ! `}
-        />
         <Message
           color="grey"
           size="massive"
