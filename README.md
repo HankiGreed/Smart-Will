@@ -7,18 +7,19 @@ A Smart contract to execute your will, With Frontend.
 ### TODO
 
 - [ ] UI
-    - [ ] Adding end date
+    - [x] Adding end date
     - [x] Greeting with address
-    - [ ] Save Will Button
+    - [x] Save Will Button
     - [ ] Payout Expired Will
 
 - [ ] Contract Sync
     - [x] Create Will
     - [x] Delete Will
-    - [ ] Edit Will
+    - [x] Edit Will
     - [ ] Payout Will 
-    - [ ] Save Will 
+    - [x] Save Will 
 
-- [x] Form Validation
+- [ ] Form Validation
     - [x] Empty Beneficiary Issue
     - [x] Sum of Value Verification
+    - [ ] Initial Contract sum validation
