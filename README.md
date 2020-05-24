@@ -10,7 +10,7 @@ A Smart contract to execute your will, With Frontend.
     - [x] Adding end date
     - [x] Greeting with address
     - [x] Save Will Button
-    - [ ] Payout Expired Will
+    - [x] Payout Expired Will
 
 - [ ] Contract Sync
     - [x] Create Will
@@ -22,4 +22,4 @@ A Smart contract to execute your will, With Frontend.
 - [ ] Form Validation
     - [x] Empty Beneficiary Issue
     - [x] Sum of Value Verification
-    - [ ] Initial Contract sum validation
+    - [x] Initial Contract sum validation (Happens, but button isn't disabled)
