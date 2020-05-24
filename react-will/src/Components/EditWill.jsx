@@ -22,6 +22,7 @@ class EditWill extends Component {
       color: 'teal',
       account: '',
       willState: 0,
+      actualWillAmount: 0,
       willAmount: 0,
       willEnd: new Date(0),
       beneficiaries: [],
@@ -45,11 +46,9 @@ class EditWill extends Component {
     const stateOfWill = await Will.methods
       .getWillState()
       .call({from: this.state.account});
-    const willAmount = web3.utils
-      .toBN(
-        await Will.methods.getTotalAmount().call({from: this.state.account}),
-      )
-      .toString(10);
+    let willAmount = web3.utils.toBN(
+      await Will.methods.getTotalAmount().call({from: this.state.account}),
+    );
     const beneficiaries = await Will.methods
       .getAllBeneficiaries()
       .call({from: this.state.account})
@@ -58,6 +57,9 @@ class EditWill extends Component {
       .getSharesOfBeneficiaries()
       .call({from: this.state.account})
       .catch((error) => console.log(error));
+    for (let i = 0; i < beneficiaries.length; i++) {
+      willAmount.isub(web3.utils.toBN(shares[i]));
+    }
     const willEnd = await Will.methods
       .getCurrentEndDate()
       .call({from: this.state.account})
@@ -67,7 +69,7 @@ class EditWill extends Component {
       shares: shares,
       willState: stateOfWill,
       willEnd: willEnd,
-      willAmount: willAmount,
+      willAmount: willAmount.toString(),
     });
   }
 
