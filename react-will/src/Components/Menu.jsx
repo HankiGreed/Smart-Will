@@ -1,6 +1,9 @@
 import React from 'react';
-import {Icon, Menu} from 'semantic-ui-react';
+import {Icon, Menu, Popup} from 'semantic-ui-react';
 import history from '../history';
+import web3 from '../Ethereum/web3';
+import createContract from '../Ethereum/WillContract';
+import contractAddress from '../Ethereum/contractAddress';
 
 const buttonSelector = (state, address, clickHandler, condition) => {
   if (state === '1' || state === '2') {
@@ -28,12 +31,27 @@ const buttonSelector = (state, address, clickHandler, condition) => {
   }
 };
 
+const payoutExpiredWill = async (address) => {
+  console.log('called');
+  let Will = await createContract(contractAddress);
+  await Will.methods.payoutExpiredWills().send({from: address});
+};
+
 const MenuBar = ({address, willStatButton, condition}) => {
   return (
     <React.Fragment>
       <Menu icon="labeled">
         <Menu.Menu>
           {buttonSelector(willStatButton, address, condition)}
+          <Popup
+            content="This button pays-out all the wills that are expired"
+            trigger={
+              <Menu.Item onclick={() => payoutExpiredWill(address)} as="a">
+                <Icon name="share" color="olive" />
+                Payout Wills
+              </Menu.Item>
+            }
+          />
         </Menu.Menu>
         <Menu.Item
           name="Home"
